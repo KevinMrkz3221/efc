@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 # import necessary viewsets
 # from .views import YourViewSet  # Import your viewsets here
-from .views import ViewSetOrganizacion, ViewSetUsuarioOrganizacion
+from .views import RecordViewSet, DocumentViewSet, ViewSetDocumentByRecord
 # Create a router and register your viewsets with it
 
 router = DefaultRouter()
@@ -13,8 +13,9 @@ router = DefaultRouter()
 # Example:
 # from .views import MyViewSet
 # router.register(r'myviewset', MyViewSet, basename='myviewset')
-router.register(r'organizaciones', ViewSetOrganizacion, basename='Organizacion')
-router.register(r'usuariosorganizaciones', ViewSetUsuarioOrganizacion, basename='UsuarioOrganizacion')
+router.register(r'records', RecordViewSet, basename='Record')
+router.register(r'documents', DocumentViewSet, basename='Document')
+router.register(r'documents_by_record', ViewSetDocumentByRecord, basename='DocumentByRecord')
 # Import your viewsets here
 
 urlpatterns = [

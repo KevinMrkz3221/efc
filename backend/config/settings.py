@@ -71,6 +71,11 @@ REST_FRAMEWORK = {
     ]
 }
 
+SWAGGER_SETTINGS = {
+    "DEFAULT_AUTO_SCHEMA_CLASS":"core.swagger.CustomAutoSchema",
+}
+
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [

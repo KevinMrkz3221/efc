@@ -3,7 +3,8 @@ from api.licence.models import Licencia
 
 
 class Organizacion(models.Model):
-    id = models.ForeignKey(Licencia, on_delete=models.CASCADE, related_name='organizaciones')
+    licencia = models.ForeignKey(Licencia, on_delete=models.CASCADE, related_name='organizaciones') 
+    
     nombre = models.CharField(max_length=100)
     rfc = models.CharField(max_length=25)
     email = models.EmailField(max_length=100)
@@ -40,7 +41,6 @@ class Organizacion(models.Model):
 
 class UsuarioOrganizacion(models.Model):
     organizacion = models.ForeignKey(Organizacion, on_delete=models.CASCADE, related_name='usuarios')
-    id_user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='usuarios_organizacion')
     email = models.EmailField(max_length=100)
     telefono = models.CharField(max_length=25)
     puesto = models.CharField(max_length=100)
@@ -58,4 +58,3 @@ class UsuarioOrganizacion(models.Model):
         verbose_name = "Usuario de Organizacion"
         verbose_name_plural = "Usuarios de Organizacion"
         db_table = 'usuario_organizacion'
-        ordering = ['usuario']
