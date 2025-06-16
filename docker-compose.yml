@@ -1,0 +1,47 @@
+services:
+  db_postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  django:
+    build: ./backend
+    container_name: EFC_django
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db_postgres
+    networks:
+      - app-network
+    environment:
+      - DB_HOST=postgres
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres123
+
+  frontend:
+    build: ./frontend
+    container_name: EFC_frontend
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    networks:
+      - app-network
+    depends_on:
+      - django
+
+
+networks:
+  app-network:
+    driver: bridge
