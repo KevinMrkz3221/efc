@@ -1,37 +1,22 @@
 from django.db import models
 
 # Create your models here.
-class Record(models.Model):
-    pedimento = models.ForeignKey('customs.Pedimento', on_delete=models.CASCADE, related_name='records')
-    organizacion = models.ForeignKey('organization.Organizacion', on_delete=models.CASCADE, related_name='records')
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = "Record"
-        verbose_name_plural = "Records"
-        db_table = 'record'
-        ordering = ['created_at']
 
 class Document(models.Model):
-    organization = models.ForeignKey('organization.Organizacion', on_delete=models.CASCADE, related_name='documents')
-    record = models.ForeignKey(Record, on_delete=models.CASCADE, related_name='documents')
-    file = models.FileField(upload_to='documents/')
-    description = models.CharField(max_length=255, blank=True, null=True)
+    organizacion = models.ForeignKey('organization.Organizacion', on_delete=models.CASCADE, related_name='documents')
+    pedimento = models.ForeignKey('customs.Pedimento', on_delete=models.CASCADE, related_name='documents')
+    archivo = models.FileField(upload_to='documents/')
+    document_type = models.ForeignKey('DocumentType', on_delete=models.CASCADE, related_name='documents', blank=True, null=True)
+    descripcion = models.CharField(max_length=255, blank=True, null=True)
     size = models.PositiveIntegerField()
     mime_type = models.CharField(max_length=100, blank=True, null=True)
 
     
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.record.name} - {self.file.name}"
+        return f"{self.archivo.name}"
 
     class Meta:
         verbose_name = "Document"
@@ -39,19 +24,15 @@ class Document(models.Model):
         db_table = 'document'
         ordering = ['created_at']
 
-class DocumentByRecord(models.Model):
-    organization = models.ForeignKey('organization.Organizacion', on_delete=models.CASCADE, related_name='documents_by_record')
-    record = models.ForeignKey(Record, on_delete=models.CASCADE, related_name='document_by_record')
-    document = models.ForeignKey(Document, on_delete=models.CASCADE, related_name='document_by_record')
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+class DocumentType(models.Model):
+    nombre = models.CharField(max_length=100, unique=True)
+    descripcion = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.record.name} - {self.document.file.name}"
+        return self.nombre
 
     class Meta:
-        verbose_name = "Document by Record"
-        verbose_name_plural = "Documents by Record"
-        db_table = 'document_by_record'
-        ordering = ['created_at']
+        verbose_name = "Tipo de Documento"
+        verbose_name_plural = "Tipos de Documento"
+        db_table = 'document_type'
+        ordering = ['nombre']

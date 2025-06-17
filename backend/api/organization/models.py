@@ -1,5 +1,6 @@
 from django.db import models
 from api.licence.models import Licencia
+from django.conf import settings
 
 
 class Organizacion(models.Model):
@@ -39,22 +40,23 @@ class Organizacion(models.Model):
         db_table = 'organizacion'
         ordering = ['nombre']
 
-class UsuarioOrganizacion(models.Model):
-    organizacion = models.ForeignKey(Organizacion, on_delete=models.CASCADE, related_name='usuarios')
-    email = models.EmailField(max_length=100)
-    telefono = models.CharField(max_length=25)
-    puesto = models.CharField(max_length=100)
+# class UsuarioOrganizacion(models.Model):
+#     organizacion = models.ForeignKey(Organizacion, on_delete=models.CASCADE, related_name='usuarios')
+#     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='usuarios_organizacion')
+#     email = models.EmailField(max_length=100)
+#     telefono = models.CharField(max_length=25)
+#     puesto = models.CharField(max_length=100)
 
-    is_active = models.BooleanField(default=True)
-    is_verified = models.BooleanField(default=False)
+#     is_active = models.BooleanField(default=True)
+#     is_verified = models.BooleanField(default=False)
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return f"{self.usuario} - {self.organizacion.nombre}"
+#     def __str__(self):
+#         return f"{self.usuario} - {self.organizacion.nombre}"
 
-    class Meta:
-        verbose_name = "Usuario de Organizacion"
-        verbose_name_plural = "Usuarios de Organizacion"
-        db_table = 'usuario_organizacion'
+#     class Meta:
+#         verbose_name = "Usuario de Organizacion"
+#         verbose_name_plural = "Usuarios de Organizacion"
+#         db_table = 'usuario_organizacion'

@@ -5,7 +5,7 @@ class Licencia(models.Model):
     # Define the Licencia model minimally for ForeignKey reference
     # Add fields as needed
     nombre = models.CharField(max_length=100)
-    descrpcion = models.TextField(blank=True, null=True)
+    descripcion = models.TextField(blank=True, null=True)
 
     class Meta:
         verbose_name = "Licencia"
@@ -14,5 +14,5 @@ class Licencia(models.Model):
 
 
     def __str__(self):
-        return self.name
+        return self.nombre
     

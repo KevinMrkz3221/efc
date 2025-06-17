@@ -16,15 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
-
+from django.conf import settings
 # 
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+from django.conf.urls.static import static
+
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
 schema_view = get_schema_view(
    openapi.Info(
-      title="Snippets API",
+      title="EFC API",
       default_version='v1',
       description="Test description",
       terms_of_service="https://www.google.com/policies/terms/",
@@ -38,6 +45,12 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('api.licence.urls')),
+
+    # JWT Authentication
+    path('api/v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/v1/user/', include('api.cuser.urls')),  # Custom user app
+
     #path('api-auth/', include('rest_framework.urls')),
     path('api/v1/swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('api/v1/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
@@ -47,4 +60,4 @@ urlpatterns = [
     path('api/v1/record/', include('api.record.urls')),
     
 
-]
+] #+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

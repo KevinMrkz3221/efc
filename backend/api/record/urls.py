@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 # import necessary viewsets
 # from .views import YourViewSet  # Import your viewsets here
-from .views import RecordViewSet, DocumentViewSet, ViewSetDocumentByRecord
+from .views import  DocumentViewSet, ProtectedDocumentDownloadView
 # Create a router and register your viewsets with it
 
 router = DefaultRouter()
@@ -13,11 +13,10 @@ router = DefaultRouter()
 # Example:
 # from .views import MyViewSet
 # router.register(r'myviewset', MyViewSet, basename='myviewset')
-router.register(r'records', RecordViewSet, basename='Record')
 router.register(r'documents', DocumentViewSet, basename='Document')
-router.register(r'documents_by_record', ViewSetDocumentByRecord, basename='DocumentByRecord')
-# Import your viewsets here
+# No registres ProtectedDocumentDownloadView en el router, solo como path individual
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('documents/descargar/<int:pk>/', ProtectedDocumentDownloadView.as_view(), name='descargar-documento'),
 ]

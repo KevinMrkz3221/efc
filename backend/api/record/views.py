@@ -1,44 +1,45 @@
 from django.shortcuts import render
-from rest_framework import viewsets
+from django.http import FileResponse, Http404
 
-from .serializers import RecordSerializer, DocumentSerializer, DocumentByRecordSerializer
-from .models import Record, Document, DocumentByRecord
+from rest_framework.views import APIView
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+
+from .serializers import DocumentSerializer
+from .models import Document
 # Create your views here.
 
-class RecordViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for Record model.
-    """
-    queryset = Record.objects.all()
-    serializer_class = RecordSerializer
-    filterset_fields = ['title', 'description', 'created_at']
-    
-    my_tags = ['Records']
+
 
 class DocumentViewSet(viewsets.ModelViewSet):
     """
     ViewSet for Document model.
     """
-    queryset = Document.objects.all()
+    permission_classes = [IsAuthenticated]
+    
     serializer_class = DocumentSerializer
-    filterset_fields = ['file', 'description', 'size', 'mime_type']
+    filterset_fields = ['archivo', 'descripcion', 'size', 'mime_type']
     
     my_tags = ['Documents']
 
-class ViewSetDocumentByRecord(viewsets.ModelViewSet):
-    """
-    ViewSet for DocumentByRecord model.
-    """
-    queryset = DocumentByRecord.objects.all()
-    serializer_class = DocumentByRecordSerializer
-    filterset_fields = ['record', 'document']
+    def get_queryset(self):
+        return Document.objects.filter(organizacion=self.request.user.organizacion)
     
-    my_tags = ['Documents_By_Record']
-    
-    def perform_create(self, serializer):
-        # Custom logic before saving the instance
-        serializer.save()
-    
-    def perform_update(self, serializer):
-        # Custom logic before updating the instance
-        serializer.save()
+class ProtectedDocumentDownloadView(APIView):
+    # permission_classes = [IsAuthenticated]
+    serializer_class = DocumentSerializer
+
+    my_tags = ['Documents']
+
+    def get_queryset(self):
+        return Document.objects.filter(organizacion=self.request.user.organizacion)
+
+    def get(self, request, pk):
+        try:
+            doc = Document.objects.get(pk=pk)
+        except Document.DoesNotExist:
+            raise Http404("Documento no encontrado")
+        # Verifica que el usuario pertenece a la organización del documento
+        if doc.organizacion != request.user.organizacion:
+            raise Http404("No autorizado")
+        return FileResponse(doc.archivo.open('rb'))
