@@ -33,7 +33,7 @@ class IsSameOrganizationAndAdmin(permissions.BasePermission):
 
 class IsOwnerOrAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        return obj == request.user or request.user.is_staff
+        return (obj == request.user or request.user.groups.filter(name='admin').exists()) and (obj.organizacion == request.user.organizacion) 
     
 class IsSuperUser(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
