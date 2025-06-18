@@ -6,6 +6,8 @@ class Licencia(models.Model):
     # Add fields as needed
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True, null=True)
+    almacenamiento = models.PositiveIntegerField(default=0, blank=False, null=False)  # in GB
+
 
     class Meta:
         verbose_name = "Licencia"

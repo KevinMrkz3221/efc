@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
+from core.permissions import IsSameOrganization
 from .serializers import DocumentSerializer
 from .models import Document
 # Create your views here.
@@ -15,7 +16,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
     """
     ViewSet for Document model.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSameOrganization]
     
     serializer_class = DocumentSerializer
     filterset_fields = ['archivo', 'descripcion', 'size', 'mime_type']
@@ -26,9 +27,8 @@ class DocumentViewSet(viewsets.ModelViewSet):
         return Document.objects.filter(organizacion=self.request.user.organizacion)
     
 class ProtectedDocumentDownloadView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSameOrganization]
     serializer_class = DocumentSerializer
-
     my_tags = ['Documents']
 
     def get_queryset(self):

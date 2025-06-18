@@ -58,6 +58,6 @@ urlpatterns = [
     path('api/v1/customs/', include('api.customs.urls')),
     path('api/v1/organization/', include('api.organization.urls')),
     path('api/v1/record/', include('api.record.urls')),
-    
+    path('api/v1/datastage/', include('api.datastage.urls')),
 
 ] #+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

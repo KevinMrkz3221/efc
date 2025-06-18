@@ -50,6 +50,7 @@ OWN_APPS = [
     'api.organization',
     'api.licence',
     'api.cuser',    
+    'api.datastage',
 ]
 
 INSTALLED_APPS = BASE_APPS + THIRD_APPS + OWN_APPS

@@ -9,5 +9,5 @@ router.register(r'users', CustomUserViewSet, basename='customuser')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('profile-picture/<int:user_id>/', ProfilePictureView.as_view(), name='profile-picture'),
+    path('profile-picture/<uuid:user_id>/', ProfilePictureView.as_view(), name='profile-picture'),
 ]

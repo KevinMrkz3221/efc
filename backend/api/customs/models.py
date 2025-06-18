@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 
 # Create your models here.
@@ -55,6 +56,7 @@ class TipoOperacion(models.Model):
         ordering = ['tipo']
 
 class Pedimento(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     organizacion = models.ForeignKey('organization.Organizacion', on_delete=models.CASCADE, related_name='pedimentos')
     pedimento = models.CharField(max_length=20)
     patente = models.ForeignKey('Patente', on_delete=models.CASCADE, related_name='pedimentos')

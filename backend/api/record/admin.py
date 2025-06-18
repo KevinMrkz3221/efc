@@ -7,7 +7,7 @@ from .models import Document, DocumentType
 
 class DocumentAdmin(admin.ModelAdmin):
     model = Document
-    list_display = ('id', 'pedimento', 'archivo', 'descripcion', 'size', 'mime_type', 'created_at', 'updated_at')
+    list_display = ('id', 'pedimento', 'archivo', 'descripcion', 'size', 'extension', 'created_at', 'updated_at')
     search_fields = ('pedimento.pedimento', 'archivo')
     list_filter = ('created_at', 'updated_at')
 

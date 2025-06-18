@@ -1,9 +1,11 @@
 from django.db import models
 from api.licence.models import Licencia
 from django.conf import settings
+import uuid
 
 
 class Organizacion(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     licencia = models.ForeignKey(Licencia, on_delete=models.CASCADE, related_name='organizaciones') 
     
     nombre = models.CharField(max_length=100)

@@ -1,16 +1,17 @@
 from django.db import models
-
+import uuid
 # Create your models here.
 
 class Document(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     organizacion = models.ForeignKey('organization.Organizacion', on_delete=models.CASCADE, related_name='documents')
     pedimento = models.ForeignKey('customs.Pedimento', on_delete=models.CASCADE, related_name='documents')
-    archivo = models.FileField(upload_to='documents/')
+    archivo = models.FileField(upload_to='documents/', max_length=400)
     document_type = models.ForeignKey('DocumentType', on_delete=models.CASCADE, related_name='documents', blank=True, null=True)
     descripcion = models.CharField(max_length=255, blank=True, null=True)
+    extension = models.CharField(max_length=10, blank=True, null=True)
     size = models.PositiveIntegerField()
-    mime_type = models.CharField(max_length=100, blank=True, null=True)
-
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

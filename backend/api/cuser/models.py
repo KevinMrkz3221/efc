@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -9,7 +10,7 @@ class CustomUser(AbstractUser):
     """
     Custom user model that extends the default Django user model.
     """
-
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     organizacion = models.ForeignKey('organization.Organizacion', on_delete=models.CASCADE, null=True, blank=True, related_name='users')
     profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
 
