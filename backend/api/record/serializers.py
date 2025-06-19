@@ -11,9 +11,10 @@ class DocumentSerializer(serializers.ModelSerializer):
         read_only_fields = ('created_at', 'updated_at')
 
     def validate(self, attrs):
+        print(attrs)
         if not attrs.get('archivo'):
             raise serializers.ValidationError("El campo 'file' es obligatorio.")
-        if not attrs.get('organization'):
-            raise serializers.ValidationError("El campo 'organization' es obligatorio.")
+        if not attrs.get('organizacion'):
+            raise serializers.ValidationError("El campo 'organizacion' es obligatorio.")
         return attrs
 

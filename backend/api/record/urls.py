@@ -18,5 +18,5 @@ router.register(r'documents', DocumentViewSet, basename='Document')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('documents/descargar/<int:pk>/', ProtectedDocumentDownloadView.as_view(), name='descargar-documento'),
+    path('documents/descargar/<uuid:pk>/', ProtectedDocumentDownloadView.as_view(), name='descargar-documento'),
 ]

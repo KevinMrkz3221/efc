@@ -1,17 +1,22 @@
 from django.shortcuts import render
 from django.http import FileResponse, Http404
+from django.db import transaction
 
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.exceptions import ValidationError
 
 from core.permissions import IsSameOrganization
 from .serializers import DocumentSerializer
 from .models import Document
+from api.organization.models import UsoAlmacenamiento
+
+
 # Create your views here.
-
-
-
 class DocumentViewSet(viewsets.ModelViewSet):
     """
     ViewSet for Document model.
@@ -25,6 +30,87 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Document.objects.filter(organizacion=self.request.user.organizacion)
+    
+    @transaction.atomic
+    def perform_create(self, serializer):
+        organizacion = self.request.user.organizacion
+        archivo = self.request.FILES.get('archivo')
+        
+        if not archivo:
+            raise ValidationError({"archivo": "Se requiere un archivo para subir"})
+        
+        # Obtener o crear registro de uso de almacenamiento con bloqueo SELECT FOR UPDATE
+        uso = UsoAlmacenamiento.objects.select_for_update().get_or_create(
+            organizacion=organizacion,
+            defaults={'espacio_utilizado': 0}
+        )[0]
+        
+        # Calcular límites
+        max_almacenamiento_bytes = organizacion.licencia.almacenamiento * 1024 ** 3
+        nuevo_espacio_utilizado = uso.espacio_utilizado + archivo.size
+        
+        # Validación estricta con raise ValidationError
+        if nuevo_espacio_utilizado > max_almacenamiento_bytes:
+            espacio_faltante = nuevo_espacio_utilizado - max_almacenamiento_bytes
+            raise ValidationError({
+                "error": "Espacio de almacenamiento insuficiente",
+                "detalle": {
+                    "espacio_faltante_gb": round(espacio_faltante / (1024 ** 3), 2),
+                    "espacio_utilizado_gb": round(uso.espacio_utilizado / (1024 ** 3), 2),
+                    "limite_gb": organizacion.licencia.almacenamiento,
+                    "archivo_gb": round(archivo.size / (1024 ** 3), 4)
+                },
+                "codigo": "storage_limit_exceeded"
+            }, code=status.HTTP_400_BAD_REQUEST)
+        
+        # Guardar documento y actualizar espacio atómicamente
+        documento = serializer.save(
+            organizacion=organizacion,
+            size=archivo.size,
+            extension=archivo.name.split('.')[-1].lower()
+        )
+        
+        uso.espacio_utilizado = nuevo_espacio_utilizado
+        uso.save()
+        
+    @transaction.atomic
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        new_file = self.request.FILES.get('archivo')
+        
+        if new_file:
+            organizacion = self.request.user.organizacion
+            uso = UsoAlmacenamiento.objects.select_for_update().get(organizacion=organizacion)
+            
+            diferencia = new_file.size - instance.size
+            max_almacenamiento_bytes = organizacion.licencia.almacenamiento * 1024 ** 3
+            nuevo_espacio_utilizado = uso.espacio_utilizado + diferencia
+            
+            if nuevo_espacio_utilizado > max_almacenamiento_bytes:
+                espacio_faltante = nuevo_espacio_utilizado - max_almacenamiento_bytes
+                raise ValidationError({
+                    "error": "Espacio insuficiente para actualizar el archivo",
+                    "detalle": {
+                        "espacio_faltante_bytes": espacio_faltante,
+                        "tamaño_nuevo_archivo": new_file.size,
+                        "tamaño_anterior_archivo": instance.size
+                    },
+                    "codigo": "update_storage_limit_exceeded"
+                }, code=status.HTTP_400_BAD_REQUEST)
+            
+            # Actualizar documento y espacio
+            serializer.save(size=new_file.size)
+            uso.espacio_utilizado = nuevo_espacio_utilizado
+            uso.save()
+        else:
+            serializer.save()
+
+    def perform_destroy(self, instance):
+        # Restar el espacio al eliminar
+        uso = UsoAlmacenamiento.objects.get(organizacion=instance.organizacion)
+        uso.espacio_utilizado -= instance.size
+        uso.save()
+        instance.delete()
     
 class ProtectedDocumentDownloadView(APIView):
     permission_classes = [IsAuthenticated, IsSameOrganization]
@@ -43,3 +129,5 @@ class ProtectedDocumentDownloadView(APIView):
         if doc.organizacion != request.user.organizacion:
             raise Http404("No autorizado")
         return FileResponse(doc.archivo.open('rb'))
+
+

@@ -27,8 +27,7 @@ class Patente(models.Model):
         verbose_name_plural = "Patentes"
         db_table = 'patente'
         ordering = ['numero']
-    
-    
+       
 class ClavePedimento(models.Model):
     clave = models.CharField(max_length=10)
     descripcion = models.CharField(max_length=200)

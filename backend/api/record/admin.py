@@ -3,11 +3,9 @@ from .models import Document, DocumentType
 
 # Register your models here.
 
-
-
 class DocumentAdmin(admin.ModelAdmin):
     model = Document
-    list_display = ('id', 'pedimento', 'archivo', 'descripcion', 'size', 'extension', 'created_at', 'updated_at')
+    list_display = ('id', 'pedimento', 'archivo', 'size', 'extension', 'created_at', 'updated_at')
     search_fields = ('pedimento.pedimento', 'archivo')
     list_filter = ('created_at', 'updated_at')
 

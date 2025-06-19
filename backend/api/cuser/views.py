@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
-from core.permissions import IsSameOrganizationAndAdmin, IsOwnerOrAdmin
+from core.permissions import IsSameOrganizationAndAdmin, IsOwnerOrOrgAdmin
 
 from .serializers import CustomUserSerializer
 from .models import CustomUser
@@ -39,9 +39,8 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             user.save()
 
 
-
 class ProfilePictureView(APIView):
-    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]  # ¡Aquí usas el permiso!
+    permission_classes = [IsAuthenticated, IsOwnerOrOrgAdmin]  # ¡Aquí usas el permiso!
     my_tags = ['User Profile']
 
     def get(self, request, user_id):

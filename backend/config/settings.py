@@ -41,9 +41,12 @@ BASE_APPS = [
 
 THIRD_APPS = [
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'drf_yasg',
     'corsheaders'
 ]
+
 OWN_APPS = [
     'api.customs',
     'api.record',
@@ -76,15 +79,15 @@ REST_FRAMEWORK = {
     ]
 }
 
-# JWT Authentication settings
+# # JWT Authentication settings
 # REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
 #         'rest_framework_simplejwt.authentication.JWTAuthentication',
-
-#     ),
-#     'DEFAULT_PERMISSION_CLASSES': (
+#         'rest_framework.authentication.TokenAuthentication',  # Añade esta línea
+#     ],
+#     'DEFAULT_PERMISSION_CLASSES': [
 #         'rest_framework.permissions.IsAuthenticated',
-#     ),
+#     ]
 # }
 SWAGGER_SETTINGS = {
     "DEFAULT_AUTO_SCHEMA_CLASS":"core.swagger.CustomAutoSchema",
