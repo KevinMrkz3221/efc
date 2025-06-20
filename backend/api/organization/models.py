@@ -34,28 +34,24 @@ class Organizacion(models.Model):
     
     nombre = models.CharField(max_length=100)
     rfc = models.CharField(max_length=25)
+    titular = models.CharField(max_length=200)
     email = models.EmailField(max_length=100)
     telefono = models.CharField(max_length=25)
-
-    calle = models.CharField(max_length=200)
-    numero_interior = models.CharField(max_length=100)
-    numero_exterior = models.CharField(max_length=100)
-    codigo_postal = models.CharField(max_length=10)
-    colonia = models.CharField(max_length=50)
-    pais = models.CharField(max_length=30)
     estado = models.CharField(max_length=50)
     ciudad = models.CharField(max_length=50)
-
-    responsable = models.CharField(max_length=400)
-    responsable_email = models.EmailField(max_length=100)
-    responsable_telefono = models.CharField(max_length=25)
-    responsable_puesto = models.CharField(max_length=100)
 
     is_active = models.BooleanField(default=True)
     is_verified = models.BooleanField(default=False)
 
+    inicio = models.DateField(null=True, blank=True)
+    vencimiento = models.DateField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    observaciones = models.TextField(null=True, blank=True)
+    membretado = models.ImageField(upload_to='membretado/', null=True, blank=True)
+    membretado_2 = models.ImageField(upload_to='membretado/', null=True, blank=True)
 
     @property
     def espacio_utilizado(self):

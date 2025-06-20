@@ -7,7 +7,7 @@ from .models import Document
 class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
-        fields = '__all__'
+        fields = ('id', 'organizacion', 'pedimento', 'size', 'created_at', 'updated_at')
         read_only_fields = ('created_at', 'updated_at')
 
     def validate(self, attrs):

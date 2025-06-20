@@ -5,6 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from core.permissions import IsSameOrganizationAndAdmin
 from api.customs.models import Pedimento, AgenteAduanal, Aduana, ClavePedimento, TipoOperacion
 from api.customs.serializers import PedimentoSerializer, AgenteAduanalSerializer, ClavePedimentoSerializer, AduanaSerializer, TipoOperacionSerializer
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from api.customs.serializers import DocumentoSerializer
 # Create your views here.
 
 
@@ -25,6 +28,8 @@ class ViewSetPedimento(viewsets.ModelViewSet):
         )
 
     my_tags = ['Pedimentos']
+
+
 
 class ViewSetAgenteAduanal(viewsets.ModelViewSet):
     """

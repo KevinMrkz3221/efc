@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 # import necessary viewsets
 # from .views import YourViewSet  # Import your viewsets here
-from .views import  DocumentViewSet, ProtectedDocumentDownloadView
+from .views import  DocumentViewSet, ProtectedDocumentDownloadView, BulkDownloadZipView
 # Create a router and register your viewsets with it
 
 router = DefaultRouter()
@@ -17,6 +17,7 @@ router.register(r'documents', DocumentViewSet, basename='Document')
 # No registres ProtectedDocumentDownloadView en el router, solo como path individual
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('documents/bulk-download/', BulkDownloadZipView.as_view(), name='bulk-download-documents'),
     path('documents/descargar/<uuid:pk>/', ProtectedDocumentDownloadView.as_view(), name='descargar-documento'),
+    path('', include(router.urls)),
 ]

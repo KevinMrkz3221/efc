@@ -9,6 +9,7 @@ from core.permissions import IsSameOrganization
 
 from .serializers import OrganizacionSerializer, UsoAlmacenamientoSerializer
 from .models import Organizacion, UsoAlmacenamiento
+from api.customs.models import Pedimento
 
 # Create your views here.
 
@@ -67,7 +68,10 @@ class UsoAlmacenamientoViewSet(viewsets.ReadOnlyModelViewSet):
             'espacio_utilizado_gb': total_utilizado / (1024 ** 3),
             'espacio_disponible_bytes': max(max_almacenamiento_bytes - total_utilizado, 0),
             'porcentaje_utilizado': round(porcentaje, 2),
-            'total_documentos': Document.objects.filter(organizacion=organizacion).count()
+            'total_documentos': Document.objects.filter(organizacion=organizacion).count(),
+            'total_pedimentos': Pedimento.objects.filter(organizacion=organizacion).count(),
+            'total_usuarios': organizacion.users.count()
         }
         
         return Response(data)
+    

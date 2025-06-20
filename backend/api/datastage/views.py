@@ -20,13 +20,8 @@ class DataStageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally restricts the returned DataStages to a given organization,
-        by filtering against a 'organizacion' query parameter in the URL.
+        Returns DataStages only for the requesting user's organization.
         """
-        queryset = DataStage.objects.filter(organizacion = self.request.user.organizacion)
-        organizacion_id = self.request.query_params.get('organizacion', None)
-        if organizacion_id is not None:
-            queryset = queryset.filter(organizacion_id=organizacion_id)
-        return queryset
+        return DataStage.objects.filter(organizacion=self.request.user.organizacion)
     
     

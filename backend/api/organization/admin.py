@@ -3,7 +3,7 @@ from .models import Organizacion
 # Register your models here.
 
 class OrganizacionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nombre', 'rfc', 'email', 'telefono', 'is_active', 'is_verified')
+    list_display = ('id', 'nombre', 'rfc', 'email', 'telefono', 'is_active', 'is_verified', 'inicia', 'vencimiento')
     search_fields = ('nombre', 'rfc', 'email')
     list_filter = ('is_active', 'is_verified')
     ordering = ('nombre',)

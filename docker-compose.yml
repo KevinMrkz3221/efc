@@ -40,6 +40,8 @@ services:
       - app-network
     depends_on:
       - django
+    environment:
+      - NODE_ENV=development
 
 
 networks:

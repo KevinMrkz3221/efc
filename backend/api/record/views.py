@@ -14,6 +14,11 @@ from core.permissions import IsSameOrganization
 from .serializers import DocumentSerializer
 from .models import Document
 from api.organization.models import UsoAlmacenamiento
+from io import BytesIO
+import zipfile
+from django.utils.text import slugify
+from django.http import HttpResponse
+from rest_framework.decorators import action
 
 
 # Create your views here.
@@ -24,7 +29,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsSameOrganization]
     
     serializer_class = DocumentSerializer
-    filterset_fields = ['archivo', 'descripcion', 'size', 'mime_type']
+    filterset_fields = ['archivo', 'descripcion', 'size']
     
     my_tags = ['Documents']
 
@@ -129,5 +134,37 @@ class ProtectedDocumentDownloadView(APIView):
         if doc.organizacion != request.user.organizacion:
             raise Http404("No autorizado")
         return FileResponse(doc.archivo.open('rb'))
+    
+
+class BulkDownloadZipView(APIView):
+    permission_classes = [IsAuthenticated, IsSameOrganization]
+    my_tags = ['Documents']
+
+    def post(self, request):
+        pks = request.data.get('document_ids', [])
+        pedimento_nombre = request.data.get('pedimento_nombre', 'documentos')
+        if not isinstance(pks, list) or not pks:
+            return Response({"error": "Debe proporcionar una lista de IDs de documentos en 'document_ids'."}, status=400)
+
+        docs = Document.objects.filter(pk__in=pks, organizacion=request.user.organizacion)
+        if docs.count() != len(pks):
+            return Response({"error": "Uno o más documentos no existen o no pertenecen a su organización."}, status=404)
+
+        buffer = BytesIO()
+        with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            for doc in docs:
+                # Usar solo el nombre del archivo sin descripcion
+                file_name = slugify(doc.archivo.name.rsplit('/', 1)[-1].rsplit('.', 1)[0])
+                ext = doc.archivo.name.split('.')[-1]
+                zip_name = f"{file_name}.{ext}"
+                doc.archivo.open('rb')
+                zip_file.writestr(zip_name, doc.archivo.read())
+                doc.archivo.close()
+
+        buffer.seek(0)
+        safe_name = slugify(pedimento_nombre)
+        response = HttpResponse(buffer, content_type='application/zip')
+        response['Content-Disposition'] = f'attachment; filename={safe_name or "documentos"}.zip'
+        return response
 
 
